@@ -101,14 +101,14 @@ while True:
                 response = content[0]
             target_url = response.get('proxyEndpoint', 'https://000000000000.dkr.ecr.eu-west-1.amazonaws.com')
             target = str(target_url).replace('https://', '')
-            auths[target] = response.get('authorizationToken')
+            auths[target] = {'auth': response.get('authorizationToken')}
 
             # And then suppliment the credentials list with the ECR-Public token
             logging.info('Requesting ecr-public token')
             ecr_public = boto3.client('ecr-public', region_name='us-east-1')
             data = ecr_public.get_authorization_token()
             response = data.get('authorizationData', {})
-            auths['public.ecr.aws'] = response.get('authorizationToken')
+            auths['public.ecr.aws'] = {'auth': response.get('authorizationToken')}
 
             # Write the output and finish the output
             fifo.write('"auths": ' + json.dumps(auths) + '}')
